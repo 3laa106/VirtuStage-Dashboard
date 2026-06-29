@@ -9,7 +9,8 @@ import type {
 export function mapSessionStatus(status: BackendSessionStatus): SessionStatus {
   const statuses: Record<BackendSessionStatus, SessionStatus> = {
     pending: 'Pending',
-    in_progress: 'Processing Analysis',
+    in_progress: 'In Progress',
+    processing: 'Processing Analysis',
     completed: 'Completed',
     failed: 'Failed',
     cancelled: 'Cancelled',
@@ -56,14 +57,15 @@ export function mapBackendSession(dto: BackendSessionDto): SessionListItem {
     scenario: mapScenario(dto.scenario_type),
     score: dto.overall_score,
     status: mapSessionStatus(dto.status),
+    backendStatus: dto.status,
   };
 }
 
 export function mapBackendSessionDetail(dto: BackendSessionDto): SessionDetail {
   return {
     ...mapBackendSession(dto),
-    title: dto.title ?? `${mapScenario(dto.scenario_type)} Session`,
+    title: `${mapScenario(dto.scenario_type)} Session`,
     duration: formatDuration(dto.start_time, dto.end_time),
-    videoUrl: dto.recording_url ?? '',
+    difficulty: dto.difficulty_level,
   };
 }

@@ -1,18 +1,14 @@
-export interface ChartPoint {
-  t?: string;
-  v: number;
-}
+import type { BackendSessionStatus } from './session';
 
 export interface FeedbackItem {
   title: string;
   desc: string;
 }
 
-export interface EmotionSegment {
+export interface MetricCard {
   label: string;
-  flex: number;
-  color: string;
-  tooltip: string;
+  value: string | number;
+  subText?: string;
 }
 
 export interface SessionAnalytics {
@@ -21,26 +17,46 @@ export interface SessionAnalytics {
   date: string;
   time: string;
   duration: string;
+  scenario: string;
+  difficulty: string;
+  status: string;
+  backendStatus: BackendSessionStatus;
+  reportStatus: string;
+  voiceStatus: string;
+  motionStatus: string;
   overallScore: number | null;
-  scoreDelta?: string;
-  pacing: number | null;
-  pacingStatus?: string;
+  voiceScore: number | null;
+  motionScore: number | null;
+  speechRate: number | null;
   fillerWords: number | null;
-  fillerDelta?: string;
-  eyeContact: number | null;
-  eyeDelta?: string;
-  pitchHz?: string;
-  pitchConsistency?: string;
-  volumeDb?: string;
-  volumeStatus?: string;
-  pitchData: ChartPoint[];
-  volumeData: ChartPoint[];
-  emotions: EmotionSegment[];
+  pauseRatio: number | null;
+  pauseCount: number | null;
+  longestPauseSeconds: number | null;
+  confidence: number | null;
+  clarity: number | null;
+  focus: number | null;
+  anxiety: number | null;
+  voiceQualityScore: number | null;
+  voiceQualityLevel: string | null;
+  fluencyScore: number | null;
+  fluencyLevel: string | null;
+  energyControlScore: number | null;
+  energyControlLevel: string | null;
+  articulationScore: number | null;
+  articulationLevel: string | null;
+  voiceFeedback: FeedbackItem[];
+  postureScore: number | null;
+  gazeAssessment: string | null;
+  gesturesScore: number | null;
+  composureAssessment: string | null;
+  stabilityScore: number | null;
+  fidgetingLevel: string | null;
+  nervousness: number | null;
   strengths: FeedbackItem[];
   growthAreas: FeedbackItem[];
   recommendations: FeedbackItem[];
-  context?: string;
-  environment?: string;
-  hardware?: string;
-  aiEngine?: string;
+  voicePending: boolean;
+  motionPending: boolean;
+  voiceFailed: boolean;
+  motionFailed: boolean;
 }

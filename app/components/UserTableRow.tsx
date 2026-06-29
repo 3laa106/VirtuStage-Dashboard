@@ -25,7 +25,7 @@ export function UserTableRow({
         <p className={styles.textMuted}>{user.email}</p>
       </td>
       <td className="py-4 text-[#9aa1bc]">{user.sessions}</td>
-      <td className="py-4 text-[#9aa1bc]">{user.lastActive}</td>
+      <td className="py-4 text-[#9aa1bc]">{user.joinedAt}</td>
       <td className="py-4">
         <span className={`px-2 py-1 rounded-lg text-xs font-bold ${
           user.role === "admin"

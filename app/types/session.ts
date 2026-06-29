@@ -1,19 +1,24 @@
 export type BackendSessionStatus =
   | 'pending'
   | 'in_progress'
+  | 'processing'
   | 'completed'
   | 'failed'
   | 'cancelled';
 
 export type SessionStatus =
   | 'Pending'
+  | 'In Progress'
   | 'Processing Analysis'
   | 'Completed'
   | 'Failed'
   | 'Cancelled';
 
 export interface SessionStatusResponseDto {
+  session_id: string;
   status: BackendSessionStatus;
+  voice_ready: boolean;
+  motion_ready: boolean;
 }
 
 export interface BackendSessionDto {
@@ -28,8 +33,6 @@ export interface BackendSessionDto {
   voice_analysis_score?: number | null;
   motion_analysis_score?: number | null;
   created_at: string;
-  title?: string;
-  recording_url?: string | null;
 }
 
 export interface SessionListItem {
@@ -39,11 +42,15 @@ export interface SessionListItem {
   scenario: string;
   score: number | null;
   status: SessionStatus;
+  backendStatus: BackendSessionStatus;
 }
 
 export interface SessionDetail extends SessionListItem {
   title: string;
   duration: string;
-  material?: string;
-  videoUrl: string;
+  difficulty: string;
+}
+
+export function isNonTerminalStatus(status: BackendSessionStatus): boolean {
+  return !['completed', 'failed', 'cancelled'].includes(status);
 }

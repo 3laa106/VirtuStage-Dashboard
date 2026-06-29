@@ -11,16 +11,16 @@ const ITEMS_PER_PAGE = 4;
 
 interface SessionTableProps {
   sessions: SessionListItem[];
-  navigateTo: string; // e.g. "/session" or "/session-analytics"
-  actionLabel: string; // e.g. "View Replay" or "View Analysis"
+  actionLabel: string;
   onRowClick: (id: number | string) => void;
+  onRefresh?: () => void;
 }
 
 export function SessionTable({
   sessions,
-  navigateTo,
   actionLabel,
   onRowClick,
+  onRefresh,
 }: SessionTableProps) {
   const [search, setSearch] = useState('');
   const [scenario, setScenario] = useState('All');
@@ -42,7 +42,6 @@ export function SessionTable({
 
   return (
     <>
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5c6484]" />
@@ -67,15 +66,11 @@ export function SessionTable({
         >
           <option value="All">Scenario: All</option>
           <option>Job Interview</option>
-          <option>Keynote Speech</option>
-          <option>Executive Meeting</option>
           <option>Public Speaking</option>
         </select>
       </div>
 
-      {/* Table */}
       <div className={`${styles.tableContainer} mb-6`}>
-        {/* Table Header */}
         <div
           className={`grid grid-cols-12 px-6 py-3 ${styles.tableHeaderGroup}`}
         >
@@ -85,18 +80,17 @@ export function SessionTable({
           <div className="col-span-2 text-right">Actions</div>
         </div>
 
-        {/* Rows */}
         {paginated.map((session) => (
           <SessionRow
             key={session.id}
             session={session}
             actionLabel={actionLabel}
             onClick={() => onRowClick(session.id)}
+            onRefresh={onRefresh}
           />
         ))}
       </div>
 
-      {/* Pagination — hidden when no results */}
       {totalPages > 0 && (
         <div className={`${styles.flexBetween} mb-8`}>
           <p className="text-[#5c6484] text-sm">
@@ -150,57 +144,60 @@ function SessionRow({
   session,
   actionLabel,
   onClick,
+  onRefresh,
 }: {
   session: SessionListItem;
   actionLabel: string;
   onClick: () => void;
+  onRefresh?: () => void;
 }) {
-  const isProcessing = session.status === 'Processing Analysis';
-  const { status } = useSessionPolling(session.id, isProcessing);
+  const isActive = session.backendStatus !== 'completed';
+  const { status } = useSessionPolling(
+    session.id,
+    session.backendStatus,
+    onRefresh,
+  );
 
-  const currentStatus = isProcessing ? status : session.status;
-  const isNowCompleted = currentStatus === 'Completed';
+  const currentStatus = isActive ? status : session.status;
+  const canOpenReport =
+    currentStatus === 'Completed' ||
+    currentStatus === 'Processing Analysis' ||
+    currentStatus === 'Failed';
 
   return (
     <div
-      onClick={() => isNowCompleted && onClick()}
+      onClick={() => canOpenReport && onClick()}
       className={`grid grid-cols-12 px-6 py-5 transition-colors last:border-0 border-b border-[#1a1c25] ${
-        !isNowCompleted
+        !canOpenReport
           ? 'opacity-60 cursor-not-allowed'
           : 'hover:bg-white/5 cursor-pointer'
       }`}
     >
-      {/* Date */}
       <div className="col-span-3">
         <p className="text-white font-semibold text-sm">{session.date}</p>
         <p className={styles.textMuted}>{session.time}</p>
       </div>
 
-      {/* Scenario */}
       <div className="col-span-3 flex items-center">
         <ScenarioBadge scenario={session.scenario} />
       </div>
 
-      {/* Score */}
       <div className="col-span-4 flex items-center gap-3">
-        {isNowCompleted ? (
-          <ScoreProgressBar score={session.score ?? 0} />
+        {currentStatus === 'Completed' && session.score != null ? (
+          <ScoreProgressBar score={session.score} />
         ) : (
           <StatusBadge status={currentStatus} />
         )}
       </div>
 
-      {/* Actions */}
       <div
         className="col-span-2 flex items-center justify-end gap-2"
         onClick={(e) => {
-          if (!isNowCompleted) e.stopPropagation();
+          if (!canOpenReport) e.stopPropagation();
         }}
       >
-        {!isNowCompleted ? (
-          <span className="text-[#5c6484] text-xs font-bold">
-            Processing...
-          </span>
+        {!canOpenReport ? (
+          <span className="text-[#5c6484] text-xs font-bold">Waiting...</span>
         ) : (
           <button
             onClick={(e) => {

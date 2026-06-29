@@ -9,7 +9,8 @@ backend services/CRUD layer.
 ```txt
 Frontend Dashboard
   -> Central Backend API
-      -> CRUD / analysis services
+      -> CRUD Backend
+          -> PostgreSQL
 ```
 
 ## Tech Stack
@@ -150,4 +151,5 @@ The frontend expects the Central Backend to provide endpoints such as:
 - `DELETE /api/users/me`
 - dashboard, sessions, analytics, library, settings, and admin-data endpoints
 
-Some business/data endpoints may still be under backend development.
+Some business/data endpoints may still be under backend development. For the
+current deployment, only the Central Backend and CRUD Backend are required.

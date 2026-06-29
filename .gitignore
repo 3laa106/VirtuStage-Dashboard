@@ -5,6 +5,7 @@ node_modules/
 build/
 dist/
 .react-router/
+/testUpload/apache-poi-poc/target/
 
 # Local environment files
 .env
@@ -39,6 +40,9 @@ Thumbs.db
 # Test/coverage output
 coverage/
 .nyc_output/
+
+# Local demo database tooling
+/scripts/
 
 # Python/backend files if copied accidentally into this frontend repo
 __pycache__/

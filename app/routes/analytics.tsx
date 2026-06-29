@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { PageLayout } from "../components/PageLayout";
 import { ProtectedRoute } from "../components/ProtectedRoute";
@@ -18,7 +18,7 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -29,11 +29,11 @@ export default function Analytics() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchSessions();
-  }, []);
+    void fetchSessions();
+  }, [fetchSessions]);
 
   return (
     <ProtectedRoute allowedRoles={["user"]}>
@@ -57,9 +57,9 @@ export default function Analytics() {
         {!loading && !error && sessions.length > 0 && (
           <SessionTable
             sessions={sessions}
-            navigateTo="/session-analytics"
             actionLabel="View Analysis"
             onRowClick={(id) => navigate(`/session-analytics/${id}`)}
+            onRefresh={fetchSessions}
           />
         )}
       </PageLayout>

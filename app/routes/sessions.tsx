@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { PageLayout } from "../components/PageLayout";
-import { ProtectedRoute } from "../components/ProtectedRoute";
-import { getSessions } from "../services/sessionService";
-import { SessionTable } from "../components/SessionTable";
-import { SectionHeader } from "../components/SectionHeader";
-import { LoadingSpinner } from "../components/LoadingSpinner";
-import { ErrorMessage } from "../components/ErrorMessage";
-import type { SessionListItem } from "../types/session";
-import { getApiErrorMessage } from "../utils/apiError";
-import { EmptyState } from "../components/EmptyState";
-import { History } from "lucide-react";
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router';
+import { PageLayout } from '../components/PageLayout';
+import { ProtectedRoute } from '../components/ProtectedRoute';
+import { getSessions } from '../services/sessionService';
+import { SessionTable } from '../components/SessionTable';
+import { SectionHeader } from '../components/SectionHeader';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorMessage } from '../components/ErrorMessage';
+import type { SessionListItem } from '../types/session';
+import { getApiErrorMessage } from '../utils/apiError';
+import { EmptyState } from '../components/EmptyState';
+import { History } from 'lucide-react';
 
 export default function Sessions() {
   const navigate = useNavigate();
@@ -18,25 +18,25 @@ export default function Sessions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await getSessions();
       setSessions(data);
     } catch (err) {
-      setError(getApiErrorMessage(err, "Failed to load sessions."));
+      setError(getApiErrorMessage(err, 'Failed to load sessions.'));
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchSessions();
   }, []);
 
+  useEffect(() => {
+    void fetchSessions();
+  }, [fetchSessions]);
+
   return (
-    <ProtectedRoute allowedRoles={["user"]}>
+    <ProtectedRoute allowedRoles={['user']}>
       <PageLayout>
         <SectionHeader
           title="Session Management"
@@ -57,9 +57,9 @@ export default function Sessions() {
         {!loading && !error && sessions.length > 0 && (
           <SessionTable
             sessions={sessions}
-            navigateTo="/session"
-            actionLabel="View Replay"
-            onRowClick={(id) => navigate(`/session/${id}`)}
+            actionLabel="View Analysis"
+            onRowClick={(id) => navigate(`/session-analytics/${id}`)}
+            onRefresh={fetchSessions}
           />
         )}
       </PageLayout>

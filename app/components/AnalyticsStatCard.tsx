@@ -5,8 +5,8 @@ import { styles } from '../utils/styles';
 interface AnalyticsStatCardProps {
   label: string;
   value: ReactNode;
-  badgeText: string;
-  badgeType: "positive" | "warning" | "neutral";
+  badgeText?: string;
+  badgeType?: 'positive' | 'warning' | 'neutral';
   subText?: string;
   barProgress?: number;
 }
@@ -29,9 +29,11 @@ export function AnalyticsStatCard({
     <div className={styles.cardSub}>
       <div className={`${styles.flexBetween} items-start mb-2`}>
         <p className={styles.labelMuted}>{label}</p>
-        <span className={`text-xs font-bold px-2 py-0.5 rounded ${badgeColorClass}`}>
-          {badgeText}
-        </span>
+        {badgeText ? (
+          <span className={`text-xs font-bold px-2 py-0.5 rounded ${badgeColorClass}`}>
+            {badgeText}
+          </span>
+        ) : null}
       </div>
       
       {barProgress !== undefined ? (

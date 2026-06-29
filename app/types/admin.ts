@@ -5,7 +5,7 @@ export interface ManagedUser {
   name: string;
   email: string;
   sessions: number;
-  lastActive: string;
+  joinedAt: string;
   role: UserRole;
   disabled: boolean;
 }
@@ -23,10 +23,4 @@ export interface TrainingScenario {
   id: string;
   name: string;
   enabled: boolean;
-}
-
-export interface AdminPanelData {
-  users: ManagedUser[];
-  activities: PlatformActivity[];
-  scenarios: TrainingScenario[];
 }

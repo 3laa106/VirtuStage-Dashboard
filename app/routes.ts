@@ -13,7 +13,7 @@ export default [
 
   // ── Sessions ──────────────────────────
   route("sessions", "routes/sessions.tsx"), // /sessions
-  route("session/:id", "routes/session.$id.tsx"), // /session/1 → Video replay
+  route("session/:id", "routes/session.$id.tsx"), // /session/:id → redirects to analytics
   route("session-analytics/:id", "routes/session.analytics.tsx"), // /session-analytics/1 → Detailed analysis
 
   // ── Content ───────────────────────────

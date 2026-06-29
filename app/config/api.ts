@@ -20,6 +20,10 @@ export const API_ENDPOINTS = {
   files: {
     list: "/api/files",
     upload: "/api/files",
+    download: (id: string) => `/api/files/${id}/download`,
+    status: (id: string) => `/api/files/${id}/status`,
+    slides: (id: string) => `/api/files/${id}/slides`,
+    retry: (id: string) => `/api/files/${id}/retry`,
     delete: (id: string) => `/api/files/${id}`,
   },
   settings: {
