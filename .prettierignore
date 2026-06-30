@@ -1,0 +1,8 @@
+build
+node_modules
+.react-router
+backend
+public
+*.md
+package-lock.json
+playwright/.auth

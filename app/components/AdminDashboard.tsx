@@ -23,6 +23,7 @@ import {
 } from 'recharts';
 import type { AdminDashboardData } from '../types/dashboard';
 import { EmptyState } from './EmptyState';
+import { Link } from 'react-router';
 
 interface AdminDashboardProps {
   name: string;
@@ -56,7 +57,7 @@ export function AdminDashboard({ name, data }: AdminDashboardProps) {
               ? 'No registered users yet'
               : 'Registered platform users'
           }
-          color="#5c7cff"
+          color="#c1ff72"
           icon={<Users className="w-5 h-5" />}
         />
         <StatCard
@@ -86,8 +87,8 @@ export function AdminDashboard({ name, data }: AdminDashboardProps) {
           value={sessionsToday.toString()}
           change={
             sessionsToday === 0
-              ? 'No sessions started today'
-              : 'Sessions created today (UTC)'
+              ? 'No sessions started today (Cairo time)'
+              : 'Sessions started today (Cairo time)'
           }
           color="#f472b6"
           icon={<CalendarDays className="w-5 h-5" />}
@@ -112,15 +113,15 @@ export function AdminDashboard({ name, data }: AdminDashboardProps) {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={adminSessionsData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#272b3a" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2a3325" />
                 <XAxis
                   dataKey="day"
-                  tick={{ fill: '#5c6484', fontSize: 11 }}
+                  tick={{ fill: '#aeb4a8', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: '#5c6484', fontSize: 11 }}
+                  tick={{ fill: '#aeb4a8', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -128,7 +129,7 @@ export function AdminDashboard({ name, data }: AdminDashboardProps) {
                 <Bar
                   dataKey="sessions"
                   name="Sessions"
-                  fill="#5c7cff"
+                  fill="#c1ff72"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -153,15 +154,15 @@ export function AdminDashboard({ name, data }: AdminDashboardProps) {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={adminScoreData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#272b3a" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2a3325" />
                 <XAxis
                   dataKey="month"
-                  tick={{ fill: '#5c6484', fontSize: 11 }}
+                  tick={{ fill: '#aeb4a8', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: '#5c6484', fontSize: 11 }}
+                  tick={{ fill: '#aeb4a8', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   domain={[0, 100]}
@@ -185,9 +186,9 @@ export function AdminDashboard({ name, data }: AdminDashboardProps) {
       <div className={styles.card}>
         <div className={`${styles.flexBetween} mb-5`}>
           <h2 className={styles.cardTitle}>Recent Registrations</h2>
-          <a href="/admin" className={styles.btnLink}>
+          <Link to="/admin" className={styles.btnLink}>
             View All Users →
-          </a>
+          </Link>
         </div>
         {recentRegistrations.length === 0 ? (
           <EmptyState
@@ -201,15 +202,17 @@ export function AdminDashboard({ name, data }: AdminDashboardProps) {
             {recentRegistrations.map((user) => (
               <div
                 key={user.userId}
-                className="flex flex-wrap items-center gap-4 p-3 rounded-xl bg-[#12141c] border border-[#272b3a]"
+                className="flex flex-wrap items-center gap-4 p-3 rounded-xl bg-[#121610] border border-[#2a3325]"
               >
                 <div
-                  className={`w-9 h-9 rounded-full bg-[#5c7cff]/20 ${styles.flexCenter} text-[#5c7cff] font-bold text-sm flex-shrink-0`}
+                  className={`w-9 h-9 rounded-full bg-brand/20 ${styles.flexCenter} text-brand-soft font-bold text-sm flex-shrink-0`}
                 >
                   {user.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-semibold text-sm">{user.name}</p>
+                  <p className="text-white font-semibold text-sm">
+                    {user.name}
+                  </p>
                   <p className={styles.textMuted}>{user.email}</p>
                 </div>
                 <span className={styles.textMuted}>{user.time}</span>

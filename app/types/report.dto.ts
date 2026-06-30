@@ -25,6 +25,10 @@ export interface VoiceAnalysisDto {
   anxiety_feedback: string;
   clarity_feedback: string;
   focus_feedback: string;
+  confidence_reasons?: string[] | null;
+  anxiety_reasons?: string[] | null;
+  clarity_reasons?: string[] | null;
+  focus_reasons?: string[] | null;
   analyzed_at: string;
 }
 

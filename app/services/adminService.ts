@@ -1,9 +1,7 @@
 import { API_ENDPOINTS } from '../config/api';
 import { mapAdminUser } from '../mappers/dashboardMapper';
 import type { AdminUserDto } from '../types/dashboard.dto';
-import type {
-  UpdateManagedUserStatusRequest,
-} from '../types/admin.dto';
+import type { UpdateManagedUserStatusRequest } from '../types/admin.dto';
 import type { ManagedUser } from '../types/admin';
 import type { BackendUserDto } from '../types/auth';
 import api from '../utils/api';
@@ -25,4 +23,8 @@ export const updateManagedUser = async (
     request,
   );
   return data;
+};
+
+export const deleteManagedUser = async (id: string): Promise<void> => {
+  await api.delete(API_ENDPOINTS.admin.deleteUser(id));
 };

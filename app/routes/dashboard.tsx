@@ -1,88 +1,119 @@
-import { useEffect, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useAuth } from '../context/AuthContext';
-import { PageLayout } from '../components/PageLayout';
-import { ProtectedRoute } from '../components/ProtectedRoute';
 import { getDashboardStats } from '../services/dashboardService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { UserDashboard } from '../components/UserDashboard';
-import { AdminDashboard } from '../components/AdminDashboard';
 import { getApiErrorMessage } from '../utils/apiError';
-import type {
-  AdminDashboardData,
-  UserDashboardData,
-} from '../types/dashboard';
+import type { AdminDashboardData, UserDashboardData } from '../types/dashboard';
+import { DashboardSkeleton } from '../components/PageSkeletons';
+import { useTransientMessages } from '../hooks/useTransientMessages';
+import { RefreshNotice } from '../components/RefreshNotice';
+
+const UserDashboard = lazy(() =>
+  import('../components/UserDashboard').then((module) => ({
+    default: module.UserDashboard,
+  })),
+);
+const AdminDashboard = lazy(() =>
+  import('../components/AdminDashboard').then((module) => ({
+    default: module.AdminDashboard,
+  })),
+);
+
+type DashboardRole = 'admin' | 'user';
+type DashboardStats = AdminDashboardData | UserDashboardData;
+
+const cachedDashboardStats: Record<DashboardRole, DashboardStats | null> = {
+  admin: null,
+  user: null,
+};
 
 export default function Dashboard() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
+  const roleKey: DashboardRole = isAdmin ? 'admin' : 'user';
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(
+    () => cachedDashboardStats[roleKey] === null,
+  );
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<
-    AdminDashboardData | UserDashboardData | null
-  >(null);
+  const [stats, setStats] = useState<DashboardStats | null>(
+    () => cachedDashboardStats[roleKey],
+  );
+  const { messages: refreshMessages, appendMessage: appendRefreshMessage } =
+    useTransientMessages();
+  const mountedRef = useRef(false);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
+    const hasCachedSnapshot = cachedDashboardStats[roleKey] !== null;
     try {
-      setLoading(true);
+      if (!hasCachedSnapshot) setLoading(true);
       setError(null);
       const data = isAdmin
         ? await getDashboardStats('admin')
         : await getDashboardStats('user');
+      if (!mountedRef.current) return;
+      cachedDashboardStats[roleKey] = data;
       setStats(data);
     } catch (err: unknown) {
-      setError(getApiErrorMessage(err, 'Failed to load dashboard data.'));
+      if (!mountedRef.current) return;
+      const message = getApiErrorMessage(err, 'Failed to load dashboard data.');
+      if (cachedDashboardStats[roleKey] !== null) {
+        appendRefreshMessage(`${message} Showing the latest dashboard data.`);
+      } else {
+        setError(message);
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
-  };
+  }, [appendRefreshMessage, isAdmin, roleKey]);
 
   useEffect(() => {
+    mountedRef.current = true;
+    const cachedStats = cachedDashboardStats[roleKey];
+    if (cachedStats) {
+      setStats(cachedStats);
+      setLoading(false);
+      setError(null);
+    }
     if (user) {
       fetchDashboardData();
     }
-  }, [user]);
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [fetchDashboardData, roleKey, user]);
 
-  if (loading) {
-    return (
-      <ProtectedRoute>
-        <PageLayout>
-          <LoadingSpinner text="Loading your dashboard..." />
-        </PageLayout>
-      </ProtectedRoute>
-    );
+  if (loading && !stats) {
+    return <DashboardSkeleton />;
   }
 
   if (error || !stats) {
     return (
-      <ProtectedRoute>
-        <PageLayout>
-          <ErrorMessage
-            title="Dashboard Unavailable"
-            message={error || 'No data found'}
-            onRetry={fetchDashboardData}
-          />
-        </PageLayout>
-      </ProtectedRoute>
+      <ErrorMessage
+        title="Dashboard Unavailable"
+        message={error || 'No data found'}
+        onRetry={fetchDashboardData}
+      />
     );
   }
 
   return (
-    <ProtectedRoute>
-      <PageLayout>
+    <>
+      <RefreshNotice messages={refreshMessages} />
+      <Suspense fallback={<DashboardSkeleton />}>
         {'totalUsers' in stats ? (
-          <AdminDashboard
-            name={user?.name ?? ''}
-            data={stats}
-          />
+          <AdminDashboard name={user?.name ?? ''} data={stats} />
         ) : (
-          <UserDashboard
-            name={user?.name ?? ''}
-            data={stats}
-          />
+          <UserDashboard name={user?.name ?? ''} data={stats} />
         )}
-      </PageLayout>
-    </ProtectedRoute>
+      </Suspense>
+    </>
   );
 }

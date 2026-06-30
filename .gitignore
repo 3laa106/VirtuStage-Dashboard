@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+.npm-cache/
 
 # Build output
 build/
@@ -40,6 +41,7 @@ Thumbs.db
 # Test/coverage output
 coverage/
 .nyc_output/
+playwright/.auth/
 
 # Local demo database tooling
 /scripts/
@@ -48,6 +50,12 @@ coverage/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.pytest-cache-local/
+.pytest-tmp/
+pytest_cache_plain/
+pytest_tmp_plain/
+allure-results/
+allure-report/
 venv/
 .venv/
 *.db

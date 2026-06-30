@@ -1,2 +1,77 @@
 @import 'tailwindcss';
-@plugin "daisyui";
+
+@theme {
+  --color-brand: #c1ff72;
+  --color-brand-hover: #a8ea4f;
+  --color-brand-soft: #d5ff9e;
+  --color-brand-contrast: #10140d;
+  --color-canvas: #10130f;
+  --color-canvas-deep: #070a08;
+  --color-sidebar: #0b100c;
+  --color-surface: #121610;
+  --color-panel: #1a2117;
+  --color-elevated: #263020;
+  --color-border-subtle: #2a3325;
+  --color-border-strong: #46513c;
+  --color-secondary: #d9d9d9;
+  --color-muted: #aeb4a8;
+  --color-success: #0bda62;
+  --color-warning: #ffb703;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    min-width: 320px;
+    background:
+      radial-gradient(
+        circle at 0% 100%,
+        rgba(193, 255, 114, 0.12),
+        transparent 34rem
+      ),
+      linear-gradient(115deg, #10130f 0%, #111410 48%, #062815 100%);
+    color: var(--color-secondary);
+    font-family:
+      'Atkinson Hyperlegible',
+      'Atkinson Hyperlegible Next',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-soft);
+    outline-offset: 3px;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
